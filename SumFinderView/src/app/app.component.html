@@ -1,21 +1,2 @@
-<div class="container">
-  <div class="row">
-    <h1>Sum Finder</h1>
-  </div>
-  <div class="row">
-    <div class="col-md-4">
-      <input type="number" placeholder="add number" [(ngModel)]="addNumberValue"/>
-      <br/>
-      <button class="btn btn-success" (click)="addNumber()">Add</button>
-    </div>
-    <div class="col-md-8">
-      <div class="row">
-        <ul class="" *ngFor="let num of paramNumbers">
-          {{num}}
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
+<app-numbers-view></app-numbers-view>
 <router-outlet></router-outlet>

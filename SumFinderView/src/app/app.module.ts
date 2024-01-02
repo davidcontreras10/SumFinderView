@@ -7,11 +7,13 @@ import { SignalrService } from './services/signalr.service';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NumbersViewComponent } from './numbers-view/numbers-view.component';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    NumbersViewComponent
   ],
   imports: [
     BrowserModule,
