@@ -3,6 +3,7 @@ import * as signalR from '@microsoft/signalr';
 import { HubConnectionBuilder } from '@microsoft/signalr';
 import { Observable, Subject } from 'rxjs';
 import { FinalizedSum, SumResults } from '../models';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class SignalrService {
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
-      .withUrl('https://localhost:7254/sumFinder', {
+      .withUrl(`${environment.baseServer}/sumFinder`, {
         skipNegotiation: true,
         transport: signalR.HttpTransportType.WebSockets
       })
