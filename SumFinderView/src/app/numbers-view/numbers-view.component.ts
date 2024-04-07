@@ -16,6 +16,7 @@ export class NumbersViewComponent implements OnInit {
   attemtps: number | null = null;
   processCompleted: boolean | null = null;
   processing: boolean = false;
+  cancellationRequested: boolean = false;
 
   constructor(private signalRService: SignalrService) {
   }
@@ -26,16 +27,14 @@ export class NumbersViewComponent implements OnInit {
     });
     this.signalRService.onFinalized().subscribe(res => {
       this.assignResults(res);
-      this.processCompleted = true;
-      this.processing = false;
+      this.setFlagsStop();
     });
     this.signalRService.onServerError().subscribe(error => {
       if (error) {
         console.error(error);
       }
 
-      this.processCompleted = true;
-      this.processing = false;
+      this.setFlagsStop();
       alert("Error in the server.");
     });
   }
@@ -48,10 +47,12 @@ export class NumbersViewComponent implements OnInit {
     this.attemtps = null;
     this.processCompleted = null;
     this.processing = false;
+    this.cancellationRequested = false;
   }
 
-  public cancellProcess() {
-    console.log('Cancel requested');
+  public cancelProcess() {
+    this.cancellationRequested = true;
+    this.signalRService.requestCancellation();
   }
 
   public canStartProcess() {
@@ -87,6 +88,9 @@ export class NumbersViewComponent implements OnInit {
 
 
   public onInputPaste(event: ClipboardEvent) {
+    if (this.processing || this.processCompleted === true) {
+      return;
+    }
     event.preventDefault();
     const clipboardData = event.clipboardData;
     if (clipboardData) {
@@ -107,6 +111,12 @@ export class NumbersViewComponent implements OnInit {
     }
   }
 
+  private setFlagsStop() {
+    this.cancellationRequested = true;
+    this.processCompleted = true;
+    this.processing = false;
+  }
+
   private addNewNumber(number: number) {
     if (number !== 0 && number && !isNaN(number)) {
       this.paramNumbers.push(number);
@@ -121,7 +131,9 @@ export class NumbersViewComponent implements OnInit {
       for (let i = 0; i < rows.length; i++) {
         const cells = rows[i].split('\t');
         for (let j = 0; j < cells.length; j++) {
-          const number = parseFloat(cells[j].replace(',', '.'));
+          const value = cells[j];
+          const cleanValue = this.cleanExcelValue(value);
+          const number = parseFloat(cleanValue);
           if (number !== 0 && number && !isNaN(number)) {
             numbers.push(number);
           }
@@ -129,6 +141,15 @@ export class NumbersViewComponent implements OnInit {
       }
     }
     return numbers;
+  }
+
+  private cleanExcelValue(value: string): string {
+    let cleanValue = value.replace('\r', '').replace(/,/g, '').trim();
+    if (cleanValue.startsWith('(') && cleanValue.endsWith(')')) { //is negative
+      cleanValue = cleanValue.replace('(', '-').replace(')', '');
+    }
+
+    return cleanValue;
   }
 
   private assignResults(res: SumResults) {

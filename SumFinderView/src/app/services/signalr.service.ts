@@ -51,6 +51,10 @@ export class SignalrService {
     });
   }
 
+  public requestCancellation() {
+    this.hubConnection.invoke("StopNewSumProcess");
+  }
+
   public onServerError(): Observable<any> {
     return this.serverErrorSub.asObservable();
   }
