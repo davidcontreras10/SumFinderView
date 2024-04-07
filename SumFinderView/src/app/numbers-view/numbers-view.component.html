@@ -20,7 +20,7 @@
       <ng-container *ngFor="let num of paramNumbers">
         <input type="text" class="sum-num" [value]="num" disabled>
         <button (click)="numberRemoveEvent(num)" style="color: red; font-weight: bold;" class="side-space top-space2"
-          [disabled]="processing || processCompleted">X</button>
+          [disabled]="processing || processCompleted || cancellationRequested">X</button>
       </ng-container>
     </div>
   </div>
@@ -34,7 +34,7 @@
     <div class="col-md-12">
       <br />
       <button class="btn btn-success" (click)="sendRequest()" [disabled]="!canStartProcess()">Start</button>
-      <button class="btn btn-danger" (click)="cancellProcess()" *ngIf="processing">Cancel</button>
+      <button class="btn btn-danger" (click)="cancelProcess()" *ngIf="processing">Cancel</button>
     </div>
   </div>
   <hr>
