@@ -12,6 +12,7 @@ export class SignalrService {
   private hubConnection: signalR.HubConnection;
   private listNumberFoundSub: Subject<Array<Array<number>>> = new Subject<Array<Array<number>>>();
   private finalizedSub: Subject<SumResults> = new Subject<SumResults>();
+  private serverErrorSub: Subject<any> = new Subject<any>();
   private onReadSub: Subject<SumResults> = new Subject<SumResults>();
 
   constructor() {
@@ -29,14 +30,6 @@ export class SignalrService {
     this.ngOnInit();
   }
 
-  public sendConfirmationMessage() {
-    this.hubConnection.invoke("confirmMessage", "Testing msg");
-  }
-
-  public start(numbers: number[], targetValue: number) {
-    this.hubConnection.invoke("StartNewSumProcess", numbers, targetValue);
-  }
-
   ngOnInit(): void {
     console.log("starting signalR");
     this.hubConnection.start()
@@ -45,6 +38,20 @@ export class SignalrService {
       }).catch(error => {
         return console.error('signalR error:', error);
       });
+  }
+
+  public sendConfirmationMessage() {
+    this.hubConnection.invoke("confirmMessage", "Testing msg");
+  }
+
+  public start(numbers: number[], targetValue: number) {
+    this.hubConnection.invoke("StartNewSumProcess", numbers, targetValue).catch(error => {
+      this.serverErrorSub.next(error);
+    });
+  }
+
+  public onServerError(): Observable<any> {
+    return this.serverErrorSub.asObservable();
   }
 
   public onListNumberFound(): Observable<Array<Array<number>>> {

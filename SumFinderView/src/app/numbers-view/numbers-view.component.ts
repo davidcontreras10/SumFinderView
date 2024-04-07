@@ -28,7 +28,16 @@ export class NumbersViewComponent implements OnInit {
       this.assignResults(res);
       this.processCompleted = true;
       this.processing = false;
-    })
+    });
+    this.signalRService.onServerError().subscribe(error => {
+      if (error) {
+        console.error(error);
+      }
+
+      this.processCompleted = true;
+      this.processing = false;
+      alert("Error in the server.");
+    });
   }
   title = 'SumFinderView';
 
