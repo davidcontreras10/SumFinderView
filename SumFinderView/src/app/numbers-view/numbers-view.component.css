@@ -1,0 +1,20 @@
+.sum-num {
+    width: 100px;
+}
+
+.num-input {
+    width: auto;
+    display: inline;
+}
+
+.top-space {
+    padding-top: 10px;
+}
+
+.top-space2 {
+    margin-top: 10px;
+}
+
+.side-space {
+    margin-right: 10px;
+}

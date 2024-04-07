@@ -1,13 +1,18 @@
 import { Injectable, OnInit } from '@angular/core';
 import * as signalR from '@microsoft/signalr';
 import { HubConnectionBuilder } from '@microsoft/signalr';
+import { Observable, Subject } from 'rxjs';
+import { FinalizedSum, SumResults } from '../models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalrService {
 
-  private hubConnection: signalR.HubConnection
+  private hubConnection: signalR.HubConnection;
+  private listNumberFoundSub: Subject<Array<Array<number>>> = new Subject<Array<Array<number>>>();
+  private finalizedSub: Subject<SumResults> = new Subject<SumResults>();
+  private onReadSub: Subject<SumResults> = new Subject<SumResults>();
 
   constructor() {
     this.hubConnection = new HubConnectionBuilder()
@@ -17,10 +22,10 @@ export class SignalrService {
       })
       .build();
 
-    this.hubConnection.on("listNumberFound", data => this.onListNumberFound(data));
-    this.hubConnection.on("onFinalized", data => this.onFinalized(data));
-    this.hubConnection.on("confirmationMessage", data => this.onMessageConfirmed(data));
-    this.hubConnection.on("onRead", data => this.onRead(data));
+    this.hubConnection.on("listNumberFound", data => this.onListNumberFoundEvent(data));
+    this.hubConnection.on("onFinalized", data => this.onFinalizedEvent(data));
+    this.hubConnection.on("confirmationMessage", data => this.onMessageConfirmedEvent(data));
+    this.hubConnection.on("onRead", data => this.onReadEvent(data));
     this.ngOnInit();
   }
 
@@ -42,21 +47,34 @@ export class SignalrService {
       });
   }
 
-
-  private onListNumberFound(data: any) {
-    console.log('Numbers found: ', data);
+  public onListNumberFound(): Observable<Array<Array<number>>> {
+    return this.listNumberFoundSub.asObservable();
   }
 
-  private onFinalized(data: any) {
+  public onFinalized(): Observable<SumResults> {
+    return this.finalizedSub.asObservable();
+  }
+
+  public onRead(): Observable<SumResults> {
+    return this.onReadSub.asObservable();
+  }
+
+  private onListNumberFoundEvent(data: any) {
+    this.listNumberFoundSub.next(data);
+  }
+
+  private onFinalizedEvent(data: any) {
     console.log('Process finalized: ', data);
+    this.finalizedSub.next(data);
   }
 
-  private onMessageConfirmed(data: any) {
+  private onMessageConfirmedEvent(data: any) {
     console.log(data);
   }
 
-  private onRead(data: any) {
+  private onReadEvent(data: any) {
     console.log('On read', data);
+    this.onReadSub.next(data);
   }
 
 }
